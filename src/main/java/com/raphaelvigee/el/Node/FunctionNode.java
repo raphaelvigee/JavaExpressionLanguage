@@ -1,6 +1,6 @@
 package com.raphaelvigee.el.Node;
 
-public class FunctionNode extends Node
+public class FunctionNode extends Node<Object>
 {
     public FunctionNode(String name, Node arguments)
     {

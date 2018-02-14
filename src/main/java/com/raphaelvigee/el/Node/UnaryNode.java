@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class UnaryNode extends Node
+public class UnaryNode extends Node<Object>
 {
     private static Map<String, String> aliases = new HashMap<String, String>()
     {{
@@ -27,7 +27,7 @@ public class UnaryNode extends Node
     }
 
     @Override
-    public Object evaluate()
+    public Object evaluate(Map<String, Object> env)
     {
         String operator = (String) attributes.get("operator");
         if (aliases.containsKey(operator)) {
@@ -36,6 +36,6 @@ public class UnaryNode extends Node
 
         Node node = nodes.get("node");
 
-        return functions.get(operator).apply(node.evaluate());
+        return ((Function<Object, Object>) functions.get(operator)).apply(node.evaluate(env));
     }
 }

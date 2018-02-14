@@ -1,6 +1,8 @@
 package com.raphaelvigee.el.Node;
 
-public class ConditionalNode extends Node
+import java.util.Map;
+
+public class ConditionalNode extends Node<Object>
 {
     public ConditionalNode(Node expr1, Node expr2, Node expr3)
     {
@@ -11,12 +13,12 @@ public class ConditionalNode extends Node
     }
 
     @Override
-    public Object evaluate()
+    public Object evaluate(Map<String, Object> env)
     {
         Node expr1 = nodes.get("expr1");
         Node expr2 = nodes.get("expr2");
         Node expr3 = nodes.get("expr3");
 
-        return expr1.evaluate() ? expr2.evaluate() : expr3.evaluate();
+        return (Boolean) expr1.evaluate(env) ? expr2.evaluate(env) : expr3.evaluate(env);
     }
 }

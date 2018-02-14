@@ -18,6 +18,8 @@ public class Parser
 
     private TokenStream stream;
 
+    private Set<String> names;
+
     public Parser(Map<String, Function<Object[], Object>> functions)
     {
         this.functions = functions;
@@ -55,9 +57,11 @@ public class Parser
         binaryOperators.put("**", new BinaryOperator(200, Associativity.RIGHT));
     }
 
-    public Node parse(TokenStream stream)
+    public Node parse(TokenStream stream, Set<String> names)
     {
         this.stream = stream;
+        this.names = names;
+
         Token current = stream.getCurrent();
 
         Node node = parseExpression();
@@ -184,11 +188,9 @@ public class Parser
 
                             node = new FunctionNode(tokenValue, parseArguments());
                         } else {
-                            // TODO: Implement
-                            // if(!names.containsKey(tokenValue)) {
-                            //     throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), token.value, names);
-                            // }
-                            // TODO: https://github.com/symfony/expression-language/blob/master/Parser.php#L209
+                            if (!names.contains(tokenValue)) {
+                                throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), token.value, names);
+                            }
 
                             node = new NameNode(token.stringValue());
                         }

@@ -2,10 +2,11 @@ package com.raphaelvigee.el.Node;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ListNode extends Node
+public class ListNode extends Node<List<Object>>
 {
     public List<Node> entries = new LinkedList<>();
 
@@ -15,11 +16,11 @@ public class ListNode extends Node
     }
 
     @Override
-    public Object evaluate()
+    public List<Object> evaluate(Map<String, Object> env)
     {
         return entries
                 .stream()
-                .map(Node::evaluate)
+                .map(e -> e.evaluate(env))
                 .collect(Collectors.toList());
     }
 

@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class Node
+public abstract class Node<R>
 {
     public Map<String, Node> nodes = new LinkedHashMap<>();
 
@@ -45,7 +45,7 @@ public abstract class Node
         return Objects.hash(nodes, attributes);
     }
 
-    public <R> R evaluate()
+    public R evaluate(Map<String, Object> env)
     {
         throw new RuntimeException("Unable to evaluate " + this.getClass());
     }

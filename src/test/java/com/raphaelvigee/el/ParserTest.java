@@ -6,9 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,13 +17,16 @@ public class ParserTest
 
     private final Node expected;
 
+    private final Set<String> names;
+
     private Lexer lexer;
 
     private Parser parser;
 
-    public ParserTest(String expression, Node expected)
+    public ParserTest(String expression, String[] names, Node expected)
     {
         this.expression = expression;
+        this.names = new HashSet<>(Arrays.asList(names));
         this.expected = expected;
     }
 
@@ -47,38 +48,47 @@ public class ParserTest
         return Arrays.asList(new Object[][]{
                 {
                         "a",
+                        new String[]{"a"},
                         new NameNode("a")
                 },
                 {
                         "'a'",
+                        new String[0],
                         new ConstantNode("a")
                 },
                 {
                         "3",
+                        new String[0],
                         new ConstantNode(3)
                 },
                 {
                         "false",
+                        new String[0],
                         new ConstantNode(false)
                 },
                 {
                         "true",
+                        new String[0],
                         new ConstantNode(true)
                 },
                 {
                         "null",
+                        new String[0],
                         new ConstantNode(null)
                 },
                 {
                         "-3",
+                        new String[0],
                         new UnaryNode("-", new ConstantNode(3))
                 },
                 {
                         "3 - 2",
+                        new String[0],
                         new BinaryNode("-", new ConstantNode(3), new ConstantNode(2))
                 },
                 {
                         "(3 - 3) * 2",
+                        new String[0],
                         new BinaryNode(
                                 "*",
                                 new BinaryNode("-", new ConstantNode(3), new ConstantNode(3)),
@@ -87,6 +97,7 @@ public class ParserTest
                 },
                 {
                         "foo.bar()",
+                        new String[]{"foo"},
                         new GetAttrNode(
                                 new NameNode("foo"),
                                 new ConstantNode("bar", true),
@@ -96,6 +107,7 @@ public class ParserTest
                 },
                 {
                         "foo.not()",
+                        new String[]{"foo"},
                         new GetAttrNode(
                                 new NameNode("foo"),
                                 new ConstantNode("not", true),
@@ -105,6 +117,7 @@ public class ParserTest
                 },
                 {
                         "foo.bar(\"arg1\", 2, true)",
+                        new String[]{"foo"},
                         new GetAttrNode(
                                 new NameNode("foo"),
                                 new ConstantNode("bar", true),
@@ -114,6 +127,7 @@ public class ParserTest
                 },
                 {
                         "foo[3]",
+                        new String[]{"foo"},
                         new GetAttrNode(
                                 new NameNode("foo"),
                                 new ConstantNode(3),
@@ -123,14 +137,17 @@ public class ParserTest
                 },
                 {
                         "true ? true : false",
+                        new String[0],
                         new ConditionalNode(new ConstantNode(true), new ConstantNode(true), new ConstantNode(false)),
                 },
                 {
                         "\"foo\" matches \"/foo/\"",
+                        new String[0],
                         new BinaryNode("matches", new ConstantNode("foo"), new ConstantNode("/foo/")),
                 },
                 {
                         "foo.bar().foo().baz[3]",
+                        new String[]{"foo"},
                         createGetAttrNode(
                                 createGetAttrNode(
                                         createGetAttrNode(
@@ -156,7 +173,7 @@ public class ParserTest
     public void test()
     {
         TokenStream stream = lexer.tokenize(this.expression);
-        Node parsed = parser.parse(stream);
+        Node parsed = parser.parse(stream, this.names);
 
         assertEquals(expected, parsed);
     }

@@ -1,6 +1,8 @@
 package com.raphaelvigee.el.Node;
 
-public class ConstantNode extends Node
+import java.util.Map;
+
+public class ConstantNode extends Node<Object>
 {
     private boolean isIdentifier;
 
@@ -18,7 +20,7 @@ public class ConstantNode extends Node
     }
 
     @Override
-    public Object evaluate()
+    public Object evaluate(Map<String, Object> env)
     {
         return attributes.get("value");
     }

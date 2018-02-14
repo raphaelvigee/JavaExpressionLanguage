@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MapNode extends Node
+public class MapNode extends Node<Map<Object, Object>>
 {
     Map<Node, Node> entries = new LinkedHashMap<>();
 
@@ -15,14 +15,14 @@ public class MapNode extends Node
     }
 
     @Override
-    public Object evaluate()
+    public Map<Object, Object> evaluate(Map<String, Object> env)
     {
         return entries
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().evaluate()
+                        e -> e.getValue().evaluate(env)
                 ));
     }
 
