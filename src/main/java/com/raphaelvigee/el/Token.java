@@ -2,7 +2,7 @@ package com.raphaelvigee.el;
 
 import java.util.Objects;
 
-public class Token<T> implements TokenInterface
+public class Token<T>
 {
     public T value;
 
