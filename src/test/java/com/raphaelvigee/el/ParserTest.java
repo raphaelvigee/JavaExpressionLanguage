@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ParserTests
+public class ParserTest
 {
     private final String expression;
 
@@ -23,7 +23,7 @@ public class ParserTests
 
     private Parser parser;
 
-    public ParserTests(String expression, Node expected)
+    public ParserTest(String expression, Node expected)
     {
         this.expression = expression;
         this.expected = expected;

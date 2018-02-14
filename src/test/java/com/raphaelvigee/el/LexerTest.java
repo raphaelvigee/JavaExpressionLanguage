@@ -13,7 +13,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class LexerTests
+public class LexerTest
 {
     private final String expression;
 
@@ -21,7 +21,7 @@ public class LexerTests
 
     private Lexer lexer;
 
-    public LexerTests(String expression, Token[] expected)
+    public LexerTest(String expression, Token[] expected)
     {
         this.expression = expression;
         this.expected = expected;

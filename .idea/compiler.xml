@@ -7,10 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ExpressionLanguage" />
+        <module name="JavaExpressionLanguage" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ExpressionLanguage" target="1.8" />
+      <module name="JavaExpressionLanguage" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
