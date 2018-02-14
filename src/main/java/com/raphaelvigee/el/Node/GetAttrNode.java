@@ -16,4 +16,10 @@ public class GetAttrNode extends Node
 
         attributes.put("type", type);
     }
+
+    @Override
+    public Object evaluate()
+    {
+        return super.evaluate();
+    }
 }

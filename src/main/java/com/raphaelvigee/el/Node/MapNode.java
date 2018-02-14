@@ -3,6 +3,7 @@ package com.raphaelvigee.el.Node;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MapNode extends Node
 {
@@ -11,6 +12,18 @@ public class MapNode extends Node
     public void addElement(Node value, Node key)
     {
         entries.put(key, value);
+    }
+
+    @Override
+    public Object evaluate()
+    {
+        return entries
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().evaluate()
+                ));
     }
 
     @Override

@@ -16,4 +16,10 @@ public class ConstantNode extends Node
 
         attributes.put("value", value);
     }
+
+    @Override
+    public Object evaluate()
+    {
+        return attributes.get("value");
+    }
 }

@@ -2,7 +2,7 @@ package com.raphaelvigee.el.Node;
 
 import java.util.*;
 
-public class Node
+public abstract class Node
 {
     public Map<String, Node> nodes = new LinkedHashMap<>();
 
@@ -19,23 +19,6 @@ public class Node
     public Node()
     {
 
-    }
-
-    public void compile(Compiler compiler)
-    {
-        for (Node node : nodes.values()) {
-            node.compile(compiler);
-        }
-    }
-
-    public List<Object> evaluate(List<Object> functions, List<Object> values)
-    {
-        List<Object> results = new LinkedList<>();
-        for (Node node : nodes.values()) {
-            results.add(node.evaluate(functions, values));
-        }
-
-        return results;
     }
 
     @Override
@@ -57,7 +40,11 @@ public class Node
     @Override
     public int hashCode()
     {
-
         return Objects.hash(nodes, attributes);
+    }
+
+    public <R> R evaluate()
+    {
+        throw new RuntimeException("Unable to evaluate " + this.getClass());
     }
 }
