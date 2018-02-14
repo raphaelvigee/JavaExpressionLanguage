@@ -1,6 +1,8 @@
 package com.raphaelvigee.el.Node;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class Node
 {

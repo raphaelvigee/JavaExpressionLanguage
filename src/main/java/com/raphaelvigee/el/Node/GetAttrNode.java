@@ -2,8 +2,9 @@ package com.raphaelvigee.el.Node;
 
 public class GetAttrNode extends Node
 {
-    public enum CallType {
-        PROPERTY,METHOD, ARRAY
+    public enum CallType
+    {
+        PROPERTY, METHOD, ARRAY
     }
 
     public GetAttrNode(Node node, Node attribute, ListNode arguments, CallType type)
@@ -15,11 +16,5 @@ public class GetAttrNode extends Node
         nodes.put("arguments", arguments);
 
         attributes.put("type", type);
-    }
-
-    @Override
-    public Object evaluate()
-    {
-        return super.evaluate();
     }
 }

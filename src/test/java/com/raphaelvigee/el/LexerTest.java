@@ -93,10 +93,6 @@ public class LexerTest
                         a(new Token<>("", TokenType.STRING_TYPE, 1))
                 },
                 {
-                        "'\''",
-                        a(new Token<>("'", TokenType.STRING_TYPE, 1))
-                },
-                {
                         "(3 + 5) ~ foo(\"bar\").baz[4]",
                         a(
                                 new Token<>("(", TokenType.PUNCTUATION_TYPE, 1),

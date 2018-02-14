@@ -145,7 +145,7 @@ public class ParserTest
                                         "baz",
                                         GetAttrNode.CallType.PROPERTY
                                 ),
-                                '3',
+                                3,
                                 GetAttrNode.CallType.ARRAY
                         ),
                 }
