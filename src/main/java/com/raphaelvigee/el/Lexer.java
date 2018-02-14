@@ -18,7 +18,7 @@ public class Lexer
 
     private final static Pattern OPERATORS = Pattern.compile("^(?:not in(?=[\\s(])|\\!\\=\\=|not(?=[\\s(])|and(?=[\\s(])|\\=\\=\\=|\\>\\=|or(?=[\\s(])|\\<\\=|\\*\\*|\\.\\.|in(?=[\\s(])|&&|\\|\\||matches|\\=\\=|\\!\\=|\\*|~|%|\\/|\\>|\\||\\!|\\^|&|\\+|\\<|\\-)");
 
-    private final static Pattern STRING = Pattern.compile("^([\\\"'])((?:\\\\\\1|.)*)\\1");
+    private final static Pattern STRING = Pattern.compile("^\"([^\"]*(?:\\.[^\"]*)*)\"|'([^']*(?:\\.[^']*)*)'");
 
     static class BracketDefinition
     {
@@ -104,7 +104,7 @@ public class Lexer
                 cursor++;
             } else if (stringMatcher.find()) {
                 String match = stringMatcher.group(0);
-                String value = stringMatcher.group(2);
+                String value = stringMatcher.group(match.startsWith("\"") ? 1 : 2);
 
                 // TODO: Remove " and ' escape
 

@@ -46,6 +46,10 @@ public class ParserTest
 
         return Arrays.asList(new Object[][]{
                 {
+                        "a",
+                        new NameNode("a")
+                },
+                {
                         "'a'",
                         new ConstantNode("a")
                 },
@@ -81,14 +85,84 @@ public class ParserTest
                                 new ConstantNode(2)
                         )
                 },
+                {
+                        "foo.bar()",
+                        new GetAttrNode(
+                                new NameNode("foo"),
+                                new ConstantNode("bar", true),
+                                new ArgumentsNode(),
+                                GetAttrNode.CallType.METHOD
+                        ),
+                },
+                {
+                        "foo.not()",
+                        new GetAttrNode(
+                                new NameNode("foo"),
+                                new ConstantNode("not", true),
+                                new ArgumentsNode(),
+                                GetAttrNode.CallType.METHOD
+                        ),
+                },
+                {
+                        "foo.bar(\"arg1\", 2, true)",
+                        new GetAttrNode(
+                                new NameNode("foo"),
+                                new ConstantNode("bar", true),
+                                arguments,
+                                GetAttrNode.CallType.METHOD
+                        ),
+                },
+                {
+                        "foo[3]",
+                        new GetAttrNode(
+                                new NameNode("foo"),
+                                new ConstantNode(3),
+                                new ArgumentsNode(),
+                                GetAttrNode.CallType.ARRAY
+                        ),
+                },
+                {
+                        "true ? true : false",
+                        new ConditionalNode(new ConstantNode(true), new ConstantNode(true), new ConstantNode(false)),
+                },
+                {
+                        "\"foo\" matches \"/foo/\"",
+                        new BinaryNode("matches", new ConstantNode("foo"), new ConstantNode("/foo/")),
+                },
+                {
+                        "foo.bar().foo().baz[3]",
+                        createGetAttrNode(
+                                createGetAttrNode(
+                                        createGetAttrNode(
+                                                createGetAttrNode(
+                                                        new NameNode("foo"),
+                                                        "bar",
+                                                        GetAttrNode.CallType.METHOD
+                                                ),
+                                                "foo",
+                                                GetAttrNode.CallType.METHOD
+                                        ),
+                                        "baz",
+                                        GetAttrNode.CallType.PROPERTY
+                                ),
+                                '3',
+                                GetAttrNode.CallType.ARRAY
+                        ),
+                }
         });
     }
 
     @Test
     public void test()
     {
-        Node parsed = parser.parse(lexer.tokenize(this.expression));
+        TokenStream stream = lexer.tokenize(this.expression);
+        Node parsed = parser.parse(stream);
 
         assertEquals(expected, parsed);
+    }
+
+    private static Node createGetAttrNode(Node node, Object item, GetAttrNode.CallType type)
+    {
+        return new GetAttrNode(node, new ConstantNode(item, GetAttrNode.CallType.ARRAY != type), new ArgumentsNode(), type);
     }
 }

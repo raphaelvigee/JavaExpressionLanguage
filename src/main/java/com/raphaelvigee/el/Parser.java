@@ -190,8 +190,7 @@ public class Parser
                             // }
                             // TODO: https://github.com/symfony/expression-language/blob/master/Parser.php#L209
 
-                            // node = new NameNode(null);
-                            throw new SyntaxError("Variables not implemented");
+                            node = new NameNode(token.stringValue());
                         }
                 }
                 break;
