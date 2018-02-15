@@ -146,6 +146,14 @@ public class EvaluateTest
                         }},
                         "a + b",
                         5
+                },
+                {
+                        new HashMap<String, Object>()
+                        {{
+                            put("bar", TestClasses.create());
+                        }},
+                        "bar.foo().baz[0].value",
+                        5
                 }
         });
     }
