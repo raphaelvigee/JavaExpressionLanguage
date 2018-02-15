@@ -30,17 +30,24 @@ public class TokenStream
         }
     }
 
-    public void expect(TokenType type, String value, String message)
+    public void expect(TokenType type, String value)
     {
-        expect(type, value);
+        expect(type, value, null);
     }
 
-    public void expect(TokenType type, String value)
+    public void expect(TokenType type, String value, String message)
     {
         Token token = getCurrent();
 
         if (!token.test(type, value)) {
-            throw new SyntaxError("Unexpected token");
+            throw new SyntaxError(String.format(
+                    "%sUnexpected token \"%s\" of value \"%s\" (\"%s\" expected%s)",
+                    message != null ? message + ". " : "",
+                    token.type,
+                    token.value,
+                    type,
+                    value != null ? String.format(" with value \"%s\"", value) : ""
+            ), token.cursor, expression);
         }
 
         next();

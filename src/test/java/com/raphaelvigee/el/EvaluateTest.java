@@ -139,6 +139,20 @@ public class EvaluateTest
                         "3 hello"
                 },
                 {
+                        null,
+                        "{a: 3, b: true}",
+                        new HashMap<Object, Object>()
+                        {{
+                            put("a", 3);
+                            put("b", true);
+                        }}
+                },
+                {
+                        null,
+                        "[1, 2, 3, 4]",
+                        Arrays.asList(1, 2, 3, 4)
+                },
+                {
                         new HashMap<String, Integer>()
                         {{
                             put("a", 3);

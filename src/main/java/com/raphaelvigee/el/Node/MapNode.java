@@ -21,7 +21,7 @@ public class MapNode extends Node<Map<Object, Object>>
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        e -> e.getKey().evaluate(env),
                         e -> e.getValue().evaluate(env)
                 ));
     }

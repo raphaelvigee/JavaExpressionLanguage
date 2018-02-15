@@ -250,25 +250,24 @@ public class Parser
 
         boolean first = true;
 
-        Token current = stream.getCurrent();
-        while (!current.test(TokenType.PUNCTUATION_TYPE, "}")) {
+        while (!stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "}")) {
             if (!first) {
                 stream.expect(TokenType.PUNCTUATION_TYPE, ",", "An array element must be followed by a comma");
 
-                if (current.test(TokenType.PUNCTUATION_TYPE, "}")) {
+                if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "}")) {
                     break;
                 }
             }
             first = false;
 
             Node key;
-            if (current.test(TokenType.STRING_TYPE) || current.test(TokenType.NAME_TYPE) || current.test(TokenType.INT_TYPE) || current.test(TokenType.DOUBLE_TYPE)) {
-                key = new ConstantNode(current.value);
+            if (stream.getCurrent().test(TokenType.STRING_TYPE) || stream.getCurrent().test(TokenType.NAME_TYPE) || stream.getCurrent().test(TokenType.INT_TYPE) || stream.getCurrent().test(TokenType.DOUBLE_TYPE)) {
+                key = new ConstantNode(stream.getCurrent().value);
                 stream.next();
-            } else if (current.test(TokenType.PUNCTUATION_TYPE, "(")) {
+            } else if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "(")) {
                 key = parseExpression();
             } else {
-                throw new SyntaxError(String.format("A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token \"%s\" of value \"%s\"", current.type, current.value), current.cursor, stream.getExpression());
+                throw new SyntaxError(String.format("A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token \"%s\" of value \"%s\"", stream.getCurrent().type, stream.getCurrent().value), stream.getCurrent().cursor, stream.getExpression());
             }
 
             stream.expect(TokenType.PUNCTUATION_TYPE, ":", "A hash key must be followed by a colon (:)");
