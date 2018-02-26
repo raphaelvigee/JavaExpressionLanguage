@@ -46,4 +46,10 @@ public class Bracket
 
         return type.open;
     }
+
+    @Override
+    public String toString()
+    {
+        return bracket;
+    }
 }

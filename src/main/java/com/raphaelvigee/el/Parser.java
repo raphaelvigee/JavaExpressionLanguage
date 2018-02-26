@@ -182,13 +182,13 @@ public class Parser
                     default:
                         if (Objects.equals(stream.getCurrent().value, "(")) {
                             if (!functions.containsKey(tokenValue)) {
-                                throw new SyntaxError(String.format("The function \"%s\" does not exist", token.value), token.cursor, stream.getExpression(), token.value, functions.keySet());
+                                throw new SyntaxError(String.format("The function \"%s\" does not exist", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), functions.keySet());
                             }
 
                             node = new FunctionNode(tokenValue, parseArguments(), functions);
                         } else {
                             if (!names.contains(tokenValue)) {
-                                throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), token.value, names);
+                                throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), names);
                             }
 
                             node = new NameNode(token.stringValue());
