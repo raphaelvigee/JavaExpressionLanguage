@@ -42,9 +42,9 @@ public class BinaryNode extends Node<Object>
         put("*", (BiFunction<Number, Number, Object>) NumberUtils::multiply);
         put("%", (BiFunction<Number, Number, Object>) NumberUtils::modulo);
         put("/", (BiFunction<Number, Number, Object>) NumberUtils::divide);
-        put("&", (Integer l, Integer r) -> l & r);
-        put("|", (Integer l, Integer r) -> l | r);
-        put("^", (Integer l, Integer r) -> l ^ r);
+        put("&", (BiFunction<Number, Number, Object>) NumberUtils::and);
+        put("|", (BiFunction<Number, Number, Object>) NumberUtils::or);
+        put("^", (BiFunction<Number, Number, Object>) NumberUtils::xor);
     }};
 
     public BinaryNode(String operator, Node left, Node right)

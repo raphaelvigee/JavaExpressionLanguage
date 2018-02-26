@@ -77,8 +77,8 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "\"test\" != \"test\"",
-                        false
+                        "not (\"test\" != \"test\")",
+                        true
                 },
                 {
                         null,
@@ -122,8 +122,8 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "\"hello\" not in [\"foo\", \"bar\"]",
-                        true
+                        "\"hello\" not in [\"foo\", \"bar\", \"hello\"]",
+                        false
                 },
                 {
                         null,
@@ -137,12 +137,22 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "true or FALSE || false",
+                        "true or FALSE",
                         true
                 },
                 {
                         null,
-                        "TRUE and false && false",
+                        "false || true",
+                        true
+                },
+                {
+                        null,
+                        "TRUE and false",
+                        false
+                },
+                {
+                        null,
+                        "true && false",
                         false
                 },
                 {
@@ -200,6 +210,11 @@ public class EvaluateTest
                         null,
                         "true ? 1 : 2",
                         1
+                },
+                {
+                        null,
+                        "false ? 1 : 2",
+                        2
                 }
         });
     }

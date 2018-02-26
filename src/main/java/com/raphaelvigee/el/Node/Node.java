@@ -10,19 +10,6 @@ public abstract class Node<R>
 
     Map<String, Object> attributes = new LinkedHashMap<>();
 
-    public Node(Map<String, Node> nodes, Map<String, Object> attributes)
-    {
-        super();
-
-        this.nodes = nodes;
-        this.attributes = attributes;
-    }
-
-    public Node()
-    {
-
-    }
-
     @Override
     public boolean equals(Object o)
     {
