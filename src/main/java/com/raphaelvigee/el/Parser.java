@@ -4,13 +4,12 @@ import com.raphaelvigee.el.Exception.SyntaxError;
 import com.raphaelvigee.el.Node.*;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser
 {
-    Map<String, Function<Object[], Object>> functions;
+    private Map<String, Function> functions;
 
     private Map<String, UnaryOperator> unaryOperators = new HashMap<>();
 
@@ -20,7 +19,7 @@ public class Parser
 
     private Set<String> names;
 
-    public Parser(Map<String, Function<Object[], Object>> functions)
+    public Parser(Map<String, Function> functions)
     {
         this.functions = functions;
 
@@ -186,7 +185,7 @@ public class Parser
                                 throw new SyntaxError(String.format("The function \"%s\" does not exist", token.value), token.cursor, stream.getExpression(), token.value, functions.keySet());
                             }
 
-                            node = new FunctionNode(tokenValue, parseArguments());
+                            node = new FunctionNode(tokenValue, parseArguments(), functions);
                         } else {
                             if (!names.contains(tokenValue)) {
                                 throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), token.value, names);

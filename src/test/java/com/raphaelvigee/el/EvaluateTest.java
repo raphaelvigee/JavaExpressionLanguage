@@ -4,10 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,6 +30,11 @@ public class EvaluateTest
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][]{
+                {
+                        null,
+                        "-3",
+                        -3
+                },
                 {
                         null,
                         "3+2",
@@ -168,6 +170,21 @@ public class EvaluateTest
                         }},
                         "bar.foo().baz[0].value",
                         5
+                },
+                {
+                        null,
+                        "hello(\"world\")",
+                        "world"
+                },
+                {
+                        null,
+                        "add(1, 2)",
+                        3
+                },
+                {
+                        null,
+                        "concat(1, \" hello \", 2)",
+                        "1 hello 2"
                 }
         });
     }
@@ -177,7 +194,37 @@ public class EvaluateTest
     {
         ExpressionLanguage el = new ExpressionLanguage();
 
-        Object result = el.evaluate(expression, env);
+        Map<String, Function> functions = new LinkedHashMap<>();
+        functions.put("hello", request -> {
+            request.arguments(1);
+
+            return request.get(0);
+        });
+
+        functions.put("add", request ->
+        {
+            request.arguments(2);
+
+            Number left = request.get(0);
+            Number right = request.get(1);
+
+            return NumberUtils.add(left, right);
+        });
+
+        functions.put("concat", request ->
+        {
+            request.arguments(0, 3);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (Object o : request.getArgs()) {
+                sb.append(String.valueOf(o));
+            }
+
+            return sb.toString();
+        });
+
+        Object result = el.evaluate(expression, env, functions);
 
         assertEquals(expected, result);
     }
