@@ -62,6 +62,16 @@ public class EvaluateTest
                 },
                 {
                         null,
+                        "!true",
+                        false
+                },
+                {
+                        null,
+                        "not false",
+                        true
+                },
+                {
+                        null,
                         "\"test\" == \"test\"",
                         true
                 },
@@ -127,12 +137,12 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "true or FALSE",
+                        "true or FALSE || false",
                         true
                 },
                 {
                         null,
-                        "TRUE and false",
+                        "TRUE and false && false",
                         false
                 },
                 {
@@ -185,6 +195,11 @@ public class EvaluateTest
                         null,
                         "concat(1, \" hello \", 2)",
                         "1 hello 2"
+                },
+                {
+                        null,
+                        "true ? 1 : 2",
+                        1
                 }
         });
     }

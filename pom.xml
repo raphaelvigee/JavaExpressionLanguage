@@ -45,6 +45,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/raphaelvigee/el/NumberUtils.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

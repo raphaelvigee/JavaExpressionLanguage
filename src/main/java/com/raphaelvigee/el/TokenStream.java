@@ -2,8 +2,8 @@ package com.raphaelvigee.el;
 
 import com.raphaelvigee.el.Exception.SyntaxError;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TokenStream
 {
@@ -71,9 +71,7 @@ public class TokenStream
     @Override
     public String toString()
     {
-        List<String> tokensStr = tokens.stream().map(Token::toString).collect(Collectors.toList());
-
-        return String.join("\n", tokensStr);
+        return String.join("\n", Arrays.asList(toArray()));
     }
 
     public String[] toArray()
