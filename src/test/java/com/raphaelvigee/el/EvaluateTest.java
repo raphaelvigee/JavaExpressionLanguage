@@ -72,27 +72,27 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "\"test\" == \"test\"",
+                        "'test' == 'test'",
                         true
                 },
                 {
                         null,
-                        "not (\"test\" != \"test\")",
+                        "not ('test' != 'test')",
                         true
                 },
                 {
                         null,
-                        "\"test\" === \"test\"",
+                        "'test' === 'test'",
                         false
                 },
                 {
                         null,
-                        "\"test\" !== \"test\"",
+                        "'test' !== 'test'",
                         true
                 },
                 {
                         null,
-                        "\"foo\" matches \"^foo$\"",
+                        "'foo' matches '^foo$'",
                         true
                 },
                 {
@@ -117,12 +117,12 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "\"hello\" in [\"foo\", \"bar\", \"hello\"]",
+                        "'hello' in ['foo', 'bar', 'hello']",
                         true
                 },
                 {
                         null,
-                        "\"hello\" not in [\"foo\", \"bar\", \"hello\"]",
+                        "'hello' not in ['foo', 'bar', 'hello']",
                         false
                 },
                 {
@@ -193,7 +193,7 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "hello(\"world\")",
+                        "hello('world')",
                         "world"
                 },
                 {
@@ -203,7 +203,7 @@ public class EvaluateTest
                 },
                 {
                         null,
-                        "concat(1, \" hello \", 2)",
+                        "concat(1, ' hello ', 2)",
                         "1 hello 2"
                 },
                 {
@@ -215,6 +215,11 @@ public class EvaluateTest
                         null,
                         "false ? 1 : 2",
                         2
+                },
+                {
+                        null,
+                        "'foo' ~ \"bar\"",
+                        "foobar"
                 }
         });
     }

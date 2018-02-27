@@ -18,7 +18,7 @@ public class Lexer
 
     private final static Pattern OPERATORS = Pattern.compile("^(?:not in(?=[\\s(])|\\!\\=\\=|not(?=[\\s(])|and(?=[\\s(])|\\=\\=\\=|\\>\\=|or(?=[\\s(])|\\<\\=|\\*\\*|\\.\\.|in(?=[\\s(])|&&|\\|\\||matches|\\=\\=|\\!\\=|\\*|~|%|\\/|\\>|\\||\\!|\\^|&|\\+|\\<|\\-)");
 
-    private final static Pattern STRING = Pattern.compile("^\"([^\"]*(?:\\.[^\"]*)*)\"|'([^']*(?:\\.[^']*)*)'");
+    private final static Pattern STRING = Pattern.compile("^(?:\"([^\"]*(?:\\.[^\"]*)*)\"|'([^']*(?:\\.[^']*)*)')");
 
     static class BracketDefinition
     {
