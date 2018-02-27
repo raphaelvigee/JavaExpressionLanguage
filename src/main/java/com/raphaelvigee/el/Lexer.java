@@ -38,10 +38,10 @@ public class Lexer
 
     public TokenStream tokenize(String expression)
     {
-        return tokenize(expression, true);
+        return tokenize(expression, 0, expression.length(), true);
     }
 
-    public TokenStream tokenize(String expression, boolean addEOF)
+    public TokenStream tokenize(String expression, int from, int end, boolean addEOF)
     {
         expression = expression.replace("\\r", " ");
         expression = expression.replace("\\n", " ");
@@ -49,10 +49,9 @@ public class Lexer
         expression = expression.replace("\\v", " ");
         expression = expression.replace("\\f", " ");
 
-        int cursor = 0;
+        int cursor = from;
         List<Token> tokens = new LinkedList<>();
         Stack<BracketDefinition> brackets = new Stack<>();
-        int end = expression.length();
 
         while (cursor < end) {
             Character currentChar = expression.charAt(cursor);
@@ -120,11 +119,12 @@ public class Lexer
                 tokens.add(new Token<>(value, TokenType.STRING_TYPE, cursor + 1));
                 cursor += match.length();
             } else if (templateStringMatcher.find()) {
+                String match = templateStringMatcher.group(0);
                 String value = templateStringMatcher.group(1);
 
                 // TODO: Remove ` escape
-
-                cursor++; // `
+                int childCursor = cursor;
+                childCursor++; // `
 
                 String childReg = "\\$\\{(.+)}";
                 Pattern reg = Pattern.compile(childReg);
@@ -134,39 +134,35 @@ public class Lexer
                 List<Token> templateTokens = new LinkedList<>();
 
                 templateTokens.add(new Token<>(strings[0], TokenType.STRING_TYPE, cursor));
-                cursor += strings[0].length();
+                childCursor += strings[0].length();
 
                 int i = 1;
                 while (matcher.find()) {
                     String childExpression = matcher.group(1);
 
-                    Lexer childLexer = new Lexer();
-                    TokenStream childStream = childLexer.tokenize(childExpression, false);
-
                     templateTokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
                     templateTokens.add(new Token<>("(", TokenType.PUNCTUATION_TYPE, cursor));
 
-                    cursor += 2; // ${
+                    childCursor += 2; // ${
+                    TokenStream childStream = tokenize(expression, childCursor, childCursor + childExpression.length(), false);
 
-                    List<Token> childTokens = childStream.getTokens();
-                    int currentCursor = cursor;
-                    childTokens.forEach(t -> t.cursor += currentCursor);
-                    templateTokens.addAll(childTokens);
-                    cursor += childExpression.length(); // Length of expression
+                    templateTokens.addAll(childStream.getTokens());
 
-                    cursor++; // }
+                    childCursor += childExpression.length();
+                    childCursor++; // }
 
                     templateTokens.add(new Token<>(")", TokenType.PUNCTUATION_TYPE, cursor));
                     templateTokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
 
                     String string = strings[i++];
                     templateTokens.add(new Token<>(string, TokenType.STRING_TYPE, cursor));
-                    cursor += string.length(); // Length of next string
+
+                    childCursor += string.length();
                 }
 
                 tokens.addAll(templateTokens);
 
-                cursor++; // `
+                cursor += match.length();
             } else if (operatorsMatcher.find()) {
                 String match = operatorsMatcher.group(0);
 
