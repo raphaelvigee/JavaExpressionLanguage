@@ -2,6 +2,7 @@ package com.raphaelvigee.el;
 
 import com.raphaelvigee.el.Exception.SyntaxError;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -20,6 +21,8 @@ public class Lexer
 
     private final static Pattern STRING = Pattern.compile("^(?:\"([^\"]*(?:\\.[^\"]*)*)\"|'([^']*(?:\\.[^']*)*)')");
 
+    private final static Pattern TEMPLATE_STRING = Pattern.compile("^`([^`]*(?:\\.[^`]*)*)`");
+
     static class BracketDefinition
     {
         Bracket bracket;
@@ -34,6 +37,11 @@ public class Lexer
     }
 
     public TokenStream tokenize(String expression)
+    {
+        return tokenize(expression, true);
+    }
+
+    public TokenStream tokenize(String expression, boolean addEOF)
     {
         expression = expression.replace("\\r", " ");
         expression = expression.replace("\\n", " ");
@@ -61,11 +69,12 @@ public class Lexer
             Matcher intMatcher = INT.matcher(candidate);
             Matcher doubleMatcher = DOUBLE.matcher(candidate);
             Matcher stringMatcher = STRING.matcher(candidate);
+            Matcher templateStringMatcher = TEMPLATE_STRING.matcher(candidate);
             Matcher operatorsMatcher = OPERATORS.matcher(candidate);
             Matcher namesMatcher = NAMES.matcher(candidate);
 
-            String[] openingBrackets = {"(", "{", "["};
-            String[] closingBrackets = {")", "}", "]"};
+            String[] openingBrackets = Arrays.stream(Bracket.Type.values()).map(type -> type.open).toArray(String[]::new);
+            String[] closingBrackets = Arrays.stream(Bracket.Type.values()).map(type -> type.close).toArray(String[]::new);
             String[] punctuations = {".", ",", "?", ":"};
 
             if (doubleMatcher.find()) {
@@ -110,6 +119,54 @@ public class Lexer
 
                 tokens.add(new Token<>(value, TokenType.STRING_TYPE, cursor + 1));
                 cursor += match.length();
+            } else if (templateStringMatcher.find()) {
+                String value = templateStringMatcher.group(1);
+
+                // TODO: Remove ` escape
+
+                cursor++; // `
+
+                String childReg = "\\$\\{(.+)}";
+                Pattern reg = Pattern.compile(childReg);
+                Matcher matcher = reg.matcher(value);
+                String[] strings = value.split(childReg, Integer.MAX_VALUE);
+
+                List<Token> templateTokens = new LinkedList<>();
+
+                templateTokens.add(new Token<>(strings[0], TokenType.STRING_TYPE, cursor));
+                cursor += strings[0].length();
+
+                int i = 1;
+                while (matcher.find()) {
+                    String childExpression = matcher.group(1);
+
+                    Lexer childLexer = new Lexer();
+                    TokenStream childStream = childLexer.tokenize(childExpression, false);
+
+                    templateTokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
+                    templateTokens.add(new Token<>("(", TokenType.PUNCTUATION_TYPE, cursor));
+
+                    cursor += 2; // ${
+
+                    List<Token> childTokens = childStream.getTokens();
+                    int currentCursor = cursor;
+                    childTokens.forEach(t -> t.cursor += currentCursor);
+                    templateTokens.addAll(childTokens);
+                    cursor += childExpression.length(); // Length of expression
+
+                    cursor++; // }
+
+                    templateTokens.add(new Token<>(")", TokenType.PUNCTUATION_TYPE, cursor));
+                    templateTokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
+
+                    String string = strings[i++];
+                    templateTokens.add(new Token<>(string, TokenType.STRING_TYPE, cursor));
+                    cursor += string.length(); // Length of next string
+                }
+
+                tokens.addAll(templateTokens);
+
+                cursor++; // `
             } else if (operatorsMatcher.find()) {
                 String match = operatorsMatcher.group(0);
 
@@ -128,7 +185,9 @@ public class Lexer
             }
         }
 
-        tokens.add(new Token<>(null, TokenType.EOF_TYPE, cursor + 1));
+        if (addEOF) {
+            tokens.add(new Token<>(null, TokenType.EOF_TYPE, cursor + 1));
+        }
 
         if (!brackets.isEmpty()) {
             BracketDefinition latest = brackets.pop();

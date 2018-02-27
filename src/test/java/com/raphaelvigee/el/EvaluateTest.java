@@ -220,6 +220,19 @@ public class EvaluateTest
                         null,
                         "'foo' ~ \"bar\"",
                         "foobar"
+                },
+                {
+                        new HashMap<String, Object>()
+                        {{
+                            put("name", "world");
+                        }},
+                        "`hello ${name} !`",
+                        "hello world !"
+                },
+                {
+                        null,
+                        "hello('hello ' ~ `${1+2}` ~ (3+2))",
+                        "hello 35"
                 }
         });
     }
