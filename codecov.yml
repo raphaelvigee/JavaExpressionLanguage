@@ -1,2 +1,3 @@
 ignore:
   - "src/main/java/com/raphaelvigee/el/NumberUtils.java"
+  - "src/main/java/com/raphaelvigee/el/NumberUtilsGenerator/*"

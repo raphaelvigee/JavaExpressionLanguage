@@ -37,14 +37,14 @@ public class BinaryNode extends Node<Object>
         put("matches", (String l, String r) -> Pattern.compile(l).matcher(r).find());
         put("==", Objects::equals);
         put("!=", (Object l, Object r) -> !Objects.equals(l, r));
-        put("+", (BiFunction<Number, Number, Object>) NumberUtils::add);
-        put("-", (BiFunction<Number, Number, Object>) NumberUtils::subtract);
-        put("*", (BiFunction<Number, Number, Object>) NumberUtils::multiply);
-        put("%", (BiFunction<Number, Number, Object>) NumberUtils::modulo);
-        put("/", (BiFunction<Number, Number, Object>) NumberUtils::divide);
-        put("&", (BiFunction<Number, Number, Object>) NumberUtils::and);
-        put("|", (BiFunction<Number, Number, Object>) NumberUtils::or);
-        put("^", (BiFunction<Number, Number, Object>) NumberUtils::xor);
+        put("+", (BiFunction<Number, Number, Number>) NumberUtils::add);
+        put("-", (BiFunction<Number, Number, Number>) NumberUtils::subtract);
+        put("*", (BiFunction<Number, Number, Number>) NumberUtils::multiply);
+        put("%", (BiFunction<Number, Number, Number>) NumberUtils::modulo);
+        put("/", (BiFunction<Number, Number, Number>) NumberUtils::divide);
+        put("&", (BiFunction<Number, Number, Number>) NumberUtils::and);
+        put("|", (BiFunction<Number, Number, Number>) NumberUtils::or);
+        put("^", (BiFunction<Number, Number, Number>) NumberUtils::xor);
     }};
 
     public BinaryNode(String operator, Node left, Node right)
