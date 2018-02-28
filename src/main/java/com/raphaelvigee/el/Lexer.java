@@ -25,22 +25,32 @@ public class Lexer
 
     private final static Pattern TEMPLATE_STRING_CHILD = Pattern.compile("\\$\\{(.+)}");
 
-    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.open).toArray(String[]::new);
+    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getOpen()).toArray(String[]::new);
 
-    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.close).toArray(String[]::new);
+    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getClose()).toArray(String[]::new);
 
     private final static String[] PUNCTUATIONS = {".", ",", "?", ":"};
 
     static class BracketDefinition
     {
-        Bracket bracket;
+        private Bracket bracket;
 
-        int cursor;
+        private int cursor;
 
         public BracketDefinition(Bracket bracket, int cursor)
         {
             this.bracket = bracket;
             this.cursor = cursor;
+        }
+
+        public Bracket getBracket()
+        {
+            return bracket;
+        }
+
+        public int getCursor()
+        {
+            return cursor;
         }
     }
 
@@ -106,10 +116,10 @@ public class Lexer
 
                 BracketDefinition lastBracketDefinition = brackets.pop();
 
-                String expected = lastBracketDefinition.bracket.opposite();
+                String expected = lastBracketDefinition.getBracket().opposite();
 
                 if (!current.equals(expected)) {
-                    throw new SyntaxError(String.format("Unclosed \"%s\"", lastBracketDefinition.bracket.bracket), lastBracketDefinition.cursor, expression);
+                    throw new SyntaxError(String.format("Unclosed \"%s\"", lastBracketDefinition.getBracket().getValue()), lastBracketDefinition.getCursor(), expression);
                 }
 
                 tokens.add(new Token<>(current, TokenType.PUNCTUATION_TYPE, cursor + 1));
@@ -186,7 +196,7 @@ public class Lexer
 
         if (!brackets.isEmpty()) {
             BracketDefinition latest = brackets.pop();
-            throw new SyntaxError(String.format("Unclosed \"%s\"", latest.bracket), latest.cursor, expression);
+            throw new SyntaxError(String.format("Unclosed \"%s\"", latest.getBracket()), latest.getCursor(), expression);
         }
 
         return new TokenStream(tokens, expression);

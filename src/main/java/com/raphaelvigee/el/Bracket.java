@@ -6,9 +6,9 @@ public class Bracket
     {
         PARENTHESIS("(", ")"), CURLY("{", "}"), SQUARED("[", "]");
 
-        final String open;
+        private final String open;
 
-        final String close;
+        private final String close;
 
         Type(String open, String close)
         {
@@ -19,37 +19,67 @@ public class Bracket
         public static Type getType(String c)
         {
             for (Type type : Type.values()) {
-                if (type.open.equals(c) || type.close.equals(c)) {
+                if (type.getOpen().equals(c) || type.getClose().equals(c)) {
                     return type;
                 }
             }
 
             throw new RuntimeException("Unhandled character");
         }
+
+        public String getOpen()
+        {
+            return open;
+        }
+
+        public String getClose()
+        {
+            return close;
+        }
     }
 
-    Type type;
+    private Type type;
 
-    String bracket;
+    private String value;
 
-    public Bracket(String bracket)
+    public Bracket(String value)
     {
-        this.bracket = bracket;
-        this.type = Type.getType(bracket);
+        this.setValue(value);
+        this.setType(Type.getType(value));
     }
 
     public String opposite()
     {
-        if (type.open.equals(bracket)) {
-            return type.close;
+        if (getType().getOpen().equals(getValue())) {
+            return getType().getClose();
         }
 
-        return type.open;
+        return getType().getOpen();
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public void setType(Type type)
+    {
+        this.type = type;
+    }
+
+    public String getValue()
+    {
+        return value;
+    }
+
+    public void setValue(String value)
+    {
+        this.value = value;
     }
 
     @Override
     public String toString()
     {
-        return bracket;
+        return getValue();
     }
 }
