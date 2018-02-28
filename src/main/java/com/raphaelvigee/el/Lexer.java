@@ -23,6 +23,8 @@ public class Lexer
 
     private final static Pattern TEMPLATE_STRING = Pattern.compile("^`([^`]*(?:\\.[^`]*)*)`");
 
+    private final static Pattern TEMPLATE_STRING_CHILD = Pattern.compile("\\$\\{(.+)}");
+
     static class BracketDefinition
     {
         Bracket bracket;
@@ -126,10 +128,8 @@ public class Lexer
                 int childCursor = cursor;
                 childCursor++; // `
 
-                String childReg = "\\$\\{(.+)}";
-                Pattern reg = Pattern.compile(childReg);
-                Matcher matcher = reg.matcher(value);
-                String[] strings = value.split(childReg, Integer.MAX_VALUE);
+                Matcher matcher = TEMPLATE_STRING_CHILD.matcher(value);
+                String[] strings = TEMPLATE_STRING_CHILD.split(value, Integer.MAX_VALUE);
 
                 List<Token> templateTokens = new LinkedList<>();
 
