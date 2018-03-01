@@ -47,4 +47,14 @@ public class ExpressionLanguage
 
         return (R) parsed.evaluate(env);
     }
+
+    public Map<String, Function> getFunctions()
+    {
+        return functions;
+    }
+
+    public void addFunction(String name, Function function)
+    {
+        functions.put(name, function);
+    }
 }
