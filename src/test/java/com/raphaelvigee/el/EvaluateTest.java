@@ -197,8 +197,11 @@ public class EvaluateTest
                         "world"
                 },
                 {
-                        null,
-                        "add(1, 2)",
+                        new HashMap<String, Object>()
+                        {{
+                            put("$", 2);
+                        }},
+                        "add(1, $)",
                         3
                 },
                 {

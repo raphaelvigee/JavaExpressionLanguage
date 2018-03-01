@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Lexer
 {
-    private final static Pattern NAMES = Pattern.compile("^[\\da-zA-Z0-9_]+");
+    private final static Pattern NAMES = Pattern.compile("^[\\da-zA-Z0-9_$]+");
 
     private final static Pattern INT = Pattern.compile("^\\d+");
 
