@@ -1,5 +1,6 @@
 package com.raphaelvigee.el.Node;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -50,7 +51,12 @@ public class GetAttrNode extends Node<Object>
                 }
             case METHOD:
                 try {
-                    Method method = nodeClass.getMethod(String.valueOf(attribute), argumentClasses);
+                    Method method = getMethodForArgs(nodeValue.getClass(), argumentClasses);
+
+                    if(method == null) {
+                        throw new  NoSuchMethodException();
+                    }
+
                     method.setAccessible(true);
 
                     return method.invoke(nodeValue, arguments);
@@ -62,5 +68,38 @@ public class GetAttrNode extends Node<Object>
         }
 
         throw new RuntimeException("Unhandled node type");
+    }
+
+    private static <T> Method getMethodForArgs(Class<T> klass, Class[] args)
+    {
+        //Get all the methods from given class
+        Method[] methods = klass.getMethods();
+
+        for (Method method : methods) {
+            //Walk through all the methods, matching parameter amount and parameter types with given types (args)
+            Class<?>[] types = method.getParameterTypes();
+            if (types.length == args.length) {
+                boolean argumentsMatch = true;
+                for (int i = 0; i < args.length; i++) {
+                    //Note that the types in args must be in same order as in the constructor if the checking is done this way
+                    if (args[i] == null) {
+                        continue;
+                    }
+
+                    if (!types[i].isAssignableFrom(args[i])) {
+                        argumentsMatch = false;
+                        break;
+                    }
+                }
+
+                if (argumentsMatch) {
+                    //We found a matching constructor, return it
+                    return method;
+                }
+            }
+        }
+
+        //No matching constructor
+        return null;
     }
 }
