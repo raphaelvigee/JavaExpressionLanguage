@@ -192,6 +192,14 @@ public class EvaluateTest
                         5
                 },
                 {
+                        new HashMap<String, Object>()
+                        {{
+                            put("bar", new TestClasses());
+                        }},
+                        "bar.returnHashMapOfArrayListOfString().get('statuses').get(0)",
+                        "baz"
+                },
+                {
                         null,
                         "hello('world')",
                         "world"

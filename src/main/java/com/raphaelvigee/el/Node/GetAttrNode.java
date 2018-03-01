@@ -1,9 +1,9 @@
 package com.raphaelvigee.el.Node;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -51,10 +51,10 @@ public class GetAttrNode extends Node<Object>
                 }
             case METHOD:
                 try {
-                    Method method = getMethodForArgs(nodeValue.getClass(), argumentClasses);
+                    Method method = getMethodForArgs(String.valueOf(attribute), nodeClass, argumentClasses);
 
-                    if(method == null) {
-                        throw new  NoSuchMethodException();
+                    if (method == null) {
+                        throw new NoSuchMethodException();
                     }
 
                     method.setAccessible(true);
@@ -70,12 +70,26 @@ public class GetAttrNode extends Node<Object>
         throw new RuntimeException("Unhandled node type");
     }
 
-    private static <T> Method getMethodForArgs(Class<T> klass, Class[] args)
+    private static Method getMethodForArgs(String name, Class klass, Class[] args)
     {
+        HashMap<Class, Class> objectToPrimitive = new HashMap<>();
+        objectToPrimitive.put(Boolean.class, boolean.class);
+        objectToPrimitive.put(Byte.class, byte.class);
+        objectToPrimitive.put(Character.class, char.class);
+        objectToPrimitive.put(Float.class, float.class);
+        objectToPrimitive.put(Integer.class, int.class);
+        objectToPrimitive.put(Long.class, long.class);
+        objectToPrimitive.put(Short.class, short.class);
+        objectToPrimitive.put(Double.class, double.class);
+
         //Get all the methods from given class
         Method[] methods = klass.getMethods();
 
         for (Method method : methods) {
+            if (!method.getName().equals(name)) {
+                continue;
+            }
+
             //Walk through all the methods, matching parameter amount and parameter types with given types (args)
             Class<?>[] types = method.getParameterTypes();
             if (types.length == args.length) {
@@ -87,8 +101,15 @@ public class GetAttrNode extends Node<Object>
                     }
 
                     if (!types[i].isAssignableFrom(args[i])) {
-                        argumentsMatch = false;
-                        break;
+                        if (objectToPrimitive.containsKey(args[i])) {
+                            if (!types[i].isAssignableFrom(objectToPrimitive.get(args[i]))) {
+                                argumentsMatch = false;
+                                break;
+                            }
+                        } else {
+                            argumentsMatch = false;
+                            break;
+                        }
                     }
                 }
 
