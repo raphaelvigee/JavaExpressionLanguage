@@ -84,7 +84,7 @@ public class Parser
 
         String tokenValue = token.stringValue();
 
-        while (token.test(TokenType.OPERATOR_TYPE) &&
+        while (token.test(TokenType.OPERATOR) &&
                 binaryOperators.containsKey(tokenValue) &&
                 binaryOperators.get(tokenValue).precedence >= precedence) {
             BinaryOperator op = binaryOperators.get(tokenValue);
@@ -110,7 +110,7 @@ public class Parser
 
         String tokenValue = token.stringValue();
 
-        if (token.test(TokenType.OPERATOR_TYPE) && unaryOperators.containsKey(tokenValue)) {
+        if (token.test(TokenType.OPERATOR) && unaryOperators.containsKey(tokenValue)) {
             UnaryOperator operator = unaryOperators.get(tokenValue);
             stream.next();
             Node expr = parseExpression(operator.precedence);
@@ -118,10 +118,10 @@ public class Parser
             return parsePostfixExpression(new UnaryNode(tokenValue, expr));
         }
 
-        if (token.test(TokenType.PUNCTUATION_TYPE, "(")) {
+        if (token.test(TokenType.PUNCTUATION, "(")) {
             stream.next();
             Node expr = parseExpression();
-            stream.expect(TokenType.PUNCTUATION_TYPE, ")", "An opened parenthesis is not properly closed");
+            stream.expect(TokenType.PUNCTUATION, ")", "An opened parenthesis is not properly closed");
 
             return parsePostfixExpression(expr);
         }
@@ -131,15 +131,15 @@ public class Parser
 
     public Node parseConditionalExpression(Node expr)
     {
-        while (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "?")) {
+        while (stream.getCurrent().test(TokenType.PUNCTUATION, "?")) {
             stream.next();
 
             Node expr2;
             Node expr3;
-            if (!stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, ":")) {
+            if (!stream.getCurrent().test(TokenType.PUNCTUATION, ":")) {
                 expr2 = parseExpression();
 
-                if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, ":")) {
+                if (stream.getCurrent().test(TokenType.PUNCTUATION, ":")) {
                     stream.next();
 
                     expr3 = parseExpression();
@@ -164,7 +164,7 @@ public class Parser
 
         Node node;
         switch (token.type) {
-            case NAME_TYPE:
+            case NAME:
                 stream.next();
 
                 String tokenValue = token.stringValue();
@@ -195,17 +195,17 @@ public class Parser
                         }
                 }
                 break;
-            case DOUBLE_TYPE:
-            case INT_TYPE:
-            case STRING_TYPE:
+            case DOUBLE:
+            case INT:
+            case STRING:
                 stream.next();
 
                 return new ConstantNode(token.value);
 
             default:
-                if (token.test(TokenType.PUNCTUATION_TYPE, "[")) {
+                if (token.test(TokenType.PUNCTUATION, "[")) {
                     node = parseArrayExpression();
-                } else if (token.test(TokenType.PUNCTUATION_TYPE, "{")) {
+                } else if (token.test(TokenType.PUNCTUATION, "{")) {
                     node = parseHashExpression();
                 } else {
                     throw new SyntaxError(String.format("Unexpected token \"%s\" of value \"%s\"", token.type, token.value), token.cursor, this.stream.getExpression());
@@ -217,17 +217,17 @@ public class Parser
 
     public Node parseArrayExpression()
     {
-        stream.expect(TokenType.PUNCTUATION_TYPE, "[", "An array element was expected");
+        stream.expect(TokenType.PUNCTUATION, "[", "An array element was expected");
 
         ListNode node = new ListNode();
 
         boolean first = true;
 
-        while (!stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "]")) {
+        while (!stream.getCurrent().test(TokenType.PUNCTUATION, "]")) {
             if (!first) {
-                stream.expect(TokenType.PUNCTUATION_TYPE, ",", "An array element must be followed by a comma");
+                stream.expect(TokenType.PUNCTUATION, ",", "An array element must be followed by a comma");
 
-                if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "]")) {
+                if (stream.getCurrent().test(TokenType.PUNCTUATION, "]")) {
                     break;
                 }
             }
@@ -236,46 +236,46 @@ public class Parser
             node.addElement(parseExpression());
         }
 
-        stream.expect(TokenType.PUNCTUATION_TYPE, "]", "An opened array is not properly closed");
+        stream.expect(TokenType.PUNCTUATION, "]", "An opened array is not properly closed");
 
         return node;
     }
 
     public MapNode parseHashExpression()
     {
-        stream.expect(TokenType.PUNCTUATION_TYPE, "{", "A hash element was expected");
+        stream.expect(TokenType.PUNCTUATION, "{", "A hash element was expected");
 
         MapNode node = new MapNode();
 
         boolean first = true;
 
-        while (!stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "}")) {
+        while (!stream.getCurrent().test(TokenType.PUNCTUATION, "}")) {
             if (!first) {
-                stream.expect(TokenType.PUNCTUATION_TYPE, ",", "An array element must be followed by a comma");
+                stream.expect(TokenType.PUNCTUATION, ",", "An array element must be followed by a comma");
 
-                if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "}")) {
+                if (stream.getCurrent().test(TokenType.PUNCTUATION, "}")) {
                     break;
                 }
             }
             first = false;
 
             Node key;
-            if (stream.getCurrent().test(TokenType.STRING_TYPE) || stream.getCurrent().test(TokenType.NAME_TYPE) || stream.getCurrent().test(TokenType.INT_TYPE) || stream.getCurrent().test(TokenType.DOUBLE_TYPE)) {
+            if (stream.getCurrent().test(TokenType.STRING) || stream.getCurrent().test(TokenType.NAME) || stream.getCurrent().test(TokenType.INT) || stream.getCurrent().test(TokenType.DOUBLE)) {
                 key = new ConstantNode(stream.getCurrent().value);
                 stream.next();
-            } else if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "(")) {
+            } else if (stream.getCurrent().test(TokenType.PUNCTUATION, "(")) {
                 key = parseExpression();
             } else {
                 throw new SyntaxError(String.format("A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token \"%s\" of value \"%s\"", stream.getCurrent().type, stream.getCurrent().value), stream.getCurrent().cursor, stream.getExpression());
             }
 
-            stream.expect(TokenType.PUNCTUATION_TYPE, ":", "A hash key must be followed by a colon (:)");
+            stream.expect(TokenType.PUNCTUATION, ":", "A hash key must be followed by a colon (:)");
             Node value = parseExpression();
 
             node.addElement(value, key);
         }
 
-        stream.expect(TokenType.PUNCTUATION_TYPE, "}", "An opened hash is not properly closed");
+        stream.expect(TokenType.PUNCTUATION, "}", "An opened hash is not properly closed");
 
         return node;
     }
@@ -284,7 +284,7 @@ public class Parser
     {
         Token token = stream.getCurrent();
 
-        while (token.test(TokenType.PUNCTUATION_TYPE)) {
+        while (token.test(TokenType.PUNCTUATION)) {
             if (Objects.equals(token.value, ".")) {
                 stream.next();
                 token = stream.getCurrent();
@@ -294,7 +294,7 @@ public class Parser
                 Matcher nameMatcher = namePattern.matcher(token.stringValue());
 
                 // https://github.com/symfony/expression-language/blob/master/Parser.php#L317
-                if (!token.test(TokenType.NAME_TYPE) && (!token.test(TokenType.OPERATOR_TYPE) || !nameMatcher.matches())) {
+                if (!token.test(TokenType.NAME) && (!token.test(TokenType.OPERATOR) || !nameMatcher.matches())) {
                     throw new SyntaxError("Expected name", token.cursor, this.stream.getExpression());
                 }
 
@@ -303,7 +303,7 @@ public class Parser
                 ArgumentsNode arguments = new ArgumentsNode();
 
                 GetAttrNode.CallType type;
-                if (stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, "(")) {
+                if (stream.getCurrent().test(TokenType.PUNCTUATION, "(")) {
                     type = GetAttrNode.CallType.METHOD;
 
                     for (Node n : parseArguments().entries) {
@@ -317,7 +317,7 @@ public class Parser
             } else if (Objects.equals(token.value, "[")) {
                 stream.next();
                 Node arg = parseExpression();
-                stream.expect(TokenType.PUNCTUATION_TYPE, "]");
+                stream.expect(TokenType.PUNCTUATION, "]");
 
                 node = new GetAttrNode(node, arg, new ArgumentsNode(), GetAttrNode.CallType.ARRAY);
             } else {
@@ -333,16 +333,16 @@ public class Parser
     public ArgumentsNode parseArguments()
     {
         List<Node> args = new LinkedList<>();
-        stream.expect(TokenType.PUNCTUATION_TYPE, "(", "A list of arguments must begin with an opening parenthesis");
+        stream.expect(TokenType.PUNCTUATION, "(", "A list of arguments must begin with an opening parenthesis");
 
-        while (!stream.getCurrent().test(TokenType.PUNCTUATION_TYPE, ")")) {
+        while (!stream.getCurrent().test(TokenType.PUNCTUATION, ")")) {
             if (!args.isEmpty()) {
-                stream.expect(TokenType.PUNCTUATION_TYPE, ",", "Arguments must be separated by a comma");
+                stream.expect(TokenType.PUNCTUATION, ",", "Arguments must be separated by a comma");
             }
 
             args.add(parseExpression());
         }
-        stream.expect(TokenType.PUNCTUATION_TYPE, ")", "A list of arguments must be closed by a parenthesis");
+        stream.expect(TokenType.PUNCTUATION, ")", "A list of arguments must be closed by a parenthesis");
 
         return new ArgumentsNode(args);
     }
