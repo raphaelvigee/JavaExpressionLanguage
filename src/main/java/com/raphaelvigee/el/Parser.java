@@ -259,7 +259,7 @@ public class Parser
         Class<?> type = ClassFinder.findClassByName((String) name.value, searchPackages);
 
         if (type == null) {
-            throw new SyntaxError("Composite type not found, type \"%s\" got \"%s\"", identifier.cursor, stream.getExpression());
+            throw new SyntaxError("Composite type not found", identifier.cursor, stream.getExpression());
         }
 
         if (Objects.equals(identifier.value, "{") && Map.class.isAssignableFrom(type)) {
