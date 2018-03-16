@@ -30,11 +30,6 @@ public class TokenStream
         }
     }
 
-    public Token getNext()
-    {
-        return tokens.get(position + 1);
-    }
-
     public void expect(TokenType type, String value)
     {
         expect(type, value, null);
