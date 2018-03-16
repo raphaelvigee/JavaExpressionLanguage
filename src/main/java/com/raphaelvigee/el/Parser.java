@@ -210,7 +210,7 @@ public class Parser
                 return new ConstantNode(token.value);
             default:
                 if (token.test(TokenType.PUNCTUATION, "[")) {
-                    node = parseListExpression(ArrayList.class);
+                    node = parseCollectionExpression(ArrayList.class);
                 } else if (token.test(TokenType.PUNCTUATION, "{")) {
                     node = parseMapExpression(HashMap.class);
                 } else {
@@ -221,11 +221,11 @@ public class Parser
         return parsePostfixExpression(node);
     }
 
-    public ListNode parseListExpression(Class<? extends List> type)
+    public CollectionNode parseCollectionExpression(Class<? extends Collection> type)
     {
         stream.expect(TokenType.PUNCTUATION, "[", "An array element was expected");
 
-        ListNode node = new ListNode(type);
+        CollectionNode node = new CollectionNode(type);
 
         boolean first = true;
 
@@ -264,8 +264,8 @@ public class Parser
 
         if (Objects.equals(identifier.value, "{") && Map.class.isAssignableFrom(type)) {
             return parseMapExpression((Class<? extends Map>) type);
-        } else if (Objects.equals(identifier.value, "[") && List.class.isAssignableFrom(type)) {
-            return parseListExpression((Class<? extends List>) type);
+        } else if (Objects.equals(identifier.value, "[") && Collection.class.isAssignableFrom(type)) {
+            return parseCollectionExpression((Class<? extends Collection>) type);
         }
 
         throw new SyntaxError(String.format("Invalid composite definition, type: \"%s\", identifier: \"%s\"", type.getSimpleName(), identifier.value), name.cursor, stream.getExpression());

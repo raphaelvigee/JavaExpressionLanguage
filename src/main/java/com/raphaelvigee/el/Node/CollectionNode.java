@@ -1,18 +1,18 @@
 package com.raphaelvigee.el.Node;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ListNode extends Node<List<Object>>
+public class CollectionNode extends Node<Collection<Object>>
 {
-    public List<Node> entries = new LinkedList<>();
+    public Collection<Node> entries = new LinkedList<>();
 
-    private Class<? extends List> type;
+    private Class<? extends Collection> type;
 
-    public ListNode(Class<? extends List> type)
+    public CollectionNode(Class<? extends Collection> type)
     {
         super();
 
@@ -25,14 +25,14 @@ public class ListNode extends Node<List<Object>>
     }
 
     @Override
-    public List<Object> evaluate(Map<String, Object> env)
+    public Collection<Object> evaluate(Map<String, Object> env)
     {
         return entries
                 .stream()
                 .map(e -> e.evaluate(env))
                 .collect(Collectors.toCollection(() -> {
                     try {
-                        return (List<Object>) type.newInstance();
+                        return (Collection<Object>) type.newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -54,8 +54,8 @@ public class ListNode extends Node<List<Object>>
             return false;
         }
 
-        ListNode listNode = (ListNode) o;
-        return Objects.equals(entries, listNode.entries);
+        CollectionNode collectionNode = (CollectionNode) o;
+        return Objects.equals(entries, collectionNode.entries);
     }
 
     @Override

@@ -181,6 +181,11 @@ public class EvaluateTest
                 },
                 {
                         null,
+                        "HashSet#[]",
+                        new HashSet<>()
+                },
+                {
+                        null,
                         "[1, 2, 3, 4]",
                         Arrays.asList(1, 2, 3, 4)
                 },

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ArgumentsNode extends ListNode
+public class ArgumentsNode extends CollectionNode
 {
     public ArgumentsNode()
     {
