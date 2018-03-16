@@ -60,7 +60,7 @@ public class TokenStream
 
     public boolean isEOF()
     {
-        return TokenType.EOF_TYPE == getCurrent().type;
+        return TokenType.EOF == getCurrent().type;
     }
 
     public String getExpression()

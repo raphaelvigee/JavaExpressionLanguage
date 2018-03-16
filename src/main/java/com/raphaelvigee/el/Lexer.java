@@ -25,11 +25,11 @@ public class Lexer
 
     private final static Pattern TEMPLATE_STRING_CHILD = Pattern.compile("\\$\\{(.+)}");
 
-    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getOpen()).toArray(String[]::new);
+    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(Bracket.Type::getOpen).toArray(String[]::new);
 
-    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getClose()).toArray(String[]::new);
+    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(Bracket.Type::getClose).toArray(String[]::new);
 
-    private final static String[] PUNCTUATIONS = {".", ",", "?", ":"};
+    private final static String[] PUNCTUATIONS = {".", ",", "?", ":", "#"};
 
     static class BracketDefinition
     {
@@ -95,19 +95,19 @@ public class Lexer
 
                 Double value = Double.valueOf(match);
 
-                tokens.add(new Token<>(value, TokenType.DOUBLE_TYPE, cursor + 1));
+                tokens.add(new Token<>(value, TokenType.DOUBLE, cursor + 1));
                 cursor += match.length();
             } else if (intMatcher.find()) {
                 String match = intMatcher.group(0);
 
                 Integer value = Integer.valueOf(match);
 
-                tokens.add(new Token<>(value, TokenType.INT_TYPE, cursor + 1));
+                tokens.add(new Token<>(value, TokenType.INT, cursor + 1));
                 cursor += match.length();
             } else if (contains(OPENING_BRACKETS, current)) {
                 brackets.add(new BracketDefinition(new Bracket(current), cursor));
 
-                tokens.add(new Token<>(current, TokenType.PUNCTUATION_TYPE, cursor + 1));
+                tokens.add(new Token<>(current, TokenType.PUNCTUATION, cursor + 1));
                 cursor++;
             } else if (contains(CLOSING_BRACKETS, current)) {
                 if (brackets.isEmpty()) {
@@ -122,7 +122,7 @@ public class Lexer
                     throw new SyntaxError(String.format("Unclosed \"%s\"", lastBracketDefinition.getBracket().getValue()), lastBracketDefinition.getCursor(), expression);
                 }
 
-                tokens.add(new Token<>(current, TokenType.PUNCTUATION_TYPE, cursor + 1));
+                tokens.add(new Token<>(current, TokenType.PUNCTUATION, cursor + 1));
                 cursor++;
             } else if (stringMatcher.find()) {
                 String match = stringMatcher.group(0);
@@ -130,7 +130,7 @@ public class Lexer
 
                 // TODO: Remove " and ' escape
 
-                tokens.add(new Token<>(value, TokenType.STRING_TYPE, cursor + 1));
+                tokens.add(new Token<>(value, TokenType.STRING, cursor + 1));
                 cursor += match.length();
             } else if (templateStringMatcher.find()) {
                 String match = templateStringMatcher.group(0);
@@ -144,15 +144,15 @@ public class Lexer
                 Matcher matcher = TEMPLATE_STRING_CHILD.matcher(value);
                 String[] strings = TEMPLATE_STRING_CHILD.split(value, Integer.MAX_VALUE);
 
-                tokens.add(new Token<>(strings[0], TokenType.STRING_TYPE, cursor));
+                tokens.add(new Token<>(strings[0], TokenType.STRING, cursor));
                 childCursor += strings[0].length();
 
                 int i = 1;
                 while (matcher.find()) {
                     String childExpression = matcher.group(1);
 
-                    tokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
-                    tokens.add(new Token<>("(", TokenType.PUNCTUATION_TYPE, cursor));
+                    tokens.add(new Token<>("~", TokenType.OPERATOR, cursor));
+                    tokens.add(new Token<>("(", TokenType.PUNCTUATION, cursor));
 
                     childCursor += 2; // ${
                     TokenStream childStream = tokenize(expression, childCursor, childCursor + childExpression.length(), false);
@@ -162,11 +162,11 @@ public class Lexer
                     childCursor += childExpression.length();
                     childCursor++; // }
 
-                    tokens.add(new Token<>(")", TokenType.PUNCTUATION_TYPE, cursor));
-                    tokens.add(new Token<>("~", TokenType.OPERATOR_TYPE, cursor));
+                    tokens.add(new Token<>(")", TokenType.PUNCTUATION, cursor));
+                    tokens.add(new Token<>("~", TokenType.OPERATOR, cursor));
 
                     String string = strings[i++];
-                    tokens.add(new Token<>(string, TokenType.STRING_TYPE, cursor));
+                    tokens.add(new Token<>(string, TokenType.STRING, cursor));
 
                     childCursor += string.length();
                 }
@@ -175,15 +175,15 @@ public class Lexer
             } else if (operatorsMatcher.find()) {
                 String match = operatorsMatcher.group(0);
 
-                tokens.add(new Token<>(match, TokenType.OPERATOR_TYPE, cursor + 1));
+                tokens.add(new Token<>(match, TokenType.OPERATOR, cursor + 1));
                 cursor += match.length();
             } else if (contains(PUNCTUATIONS, current)) {
-                tokens.add(new Token<>(current, TokenType.PUNCTUATION_TYPE, cursor + 1));
+                tokens.add(new Token<>(current, TokenType.PUNCTUATION, cursor + 1));
                 cursor++;
             } else if (namesMatcher.find()) {
                 String match = namesMatcher.group(0);
 
-                tokens.add(new Token<>(match, TokenType.NAME_TYPE, cursor + 1));
+                tokens.add(new Token<>(match, TokenType.NAME, cursor + 1));
                 cursor += match.length();
             } else {
                 throw new SyntaxError(String.format("Unexpected character \"%s\"", current), cursor, expression);
@@ -191,7 +191,7 @@ public class Lexer
         }
 
         if (addEOF) {
-            tokens.add(new Token<>(null, TokenType.EOF_TYPE, cursor + 1));
+            tokens.add(new Token<>(null, TokenType.EOF, cursor + 1));
         }
 
         if (!brackets.isEmpty()) {
