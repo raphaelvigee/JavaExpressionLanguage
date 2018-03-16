@@ -25,11 +25,11 @@ public class Lexer
 
     private final static Pattern TEMPLATE_STRING_CHILD = Pattern.compile("\\$\\{(.+)}");
 
-    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getOpen()).toArray(String[]::new);
+    private final static String[] OPENING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(Bracket.Type::getOpen).toArray(String[]::new);
 
-    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(type -> type.getClose()).toArray(String[]::new);
+    private final static String[] CLOSING_BRACKETS = Arrays.stream(Bracket.Type.values()).map(Bracket.Type::getClose).toArray(String[]::new);
 
-    private final static String[] PUNCTUATIONS = {".", ",", "?", ":"};
+    private final static String[] PUNCTUATIONS = {".", ",", "?", ":", "#"};
 
     static class BracketDefinition
     {

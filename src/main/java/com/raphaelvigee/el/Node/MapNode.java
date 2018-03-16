@@ -9,6 +9,15 @@ public class MapNode extends Node<Map<Object, Object>>
 {
     Map<Node, Node> entries = new LinkedHashMap<>();
 
+    private Class<? extends Map> type;
+
+    public MapNode(Class<? extends Map> type)
+    {
+        super();
+
+        this.type = type;
+    }
+
     public void addElement(Node value, Node key)
     {
         entries.put(key, value);
@@ -22,7 +31,17 @@ public class MapNode extends Node<Map<Object, Object>>
                 .stream()
                 .collect(Collectors.toMap(
                         e -> e.getKey().evaluate(env),
-                        e -> e.getValue().evaluate(env)
+                        e -> e.getValue().evaluate(env),
+                        (u, v) -> {
+                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+                        },
+                        () -> {
+                            try {
+                                return (Map<Object, Object>) type.newInstance();
+                            } catch (InstantiationException | IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
                 ));
     }
 

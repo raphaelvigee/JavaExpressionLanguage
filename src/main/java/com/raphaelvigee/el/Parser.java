@@ -179,21 +179,28 @@ public class Parser
                     case "null":
                     case "NULL":
                         return new ConstantNode(null);
-                    default:
-                        if (Objects.equals(stream.getCurrent().value, "(")) {
-                            if (!functions.containsKey(tokenValue)) {
-                                throw new SyntaxError(String.format("The function \"%s\" does not exist", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), functions.keySet());
-                            }
-
-                            node = new FunctionNode(tokenValue, parseArguments(), functions);
-                        } else {
-                            if (!names.contains(tokenValue)) {
-                                throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), names);
-                            }
-
-                            node = new NameNode(token.stringValue());
-                        }
                 }
+
+                Token next = stream.getCurrent();
+
+                if (Objects.equals(next.value, "#")) {
+                    stream.next();
+
+                    node = parseComposite(token);
+                } else if (Objects.equals(next.value, "(")) {
+                    if (!functions.containsKey(tokenValue)) {
+                        throw new SyntaxError(String.format("The function \"%s\" does not exist", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), functions.keySet());
+                    }
+
+                    node = new FunctionNode(tokenValue, parseArguments(), functions);
+                } else {
+                    if (!names.contains(tokenValue)) {
+                        throw new SyntaxError(String.format("Variable \"%s\" is not valid", token.value), token.cursor, stream.getExpression(), String.valueOf(token.value), names);
+                    }
+
+                    node = new NameNode(token.stringValue());
+                }
+
                 break;
             case DOUBLE:
             case INT:
@@ -201,12 +208,11 @@ public class Parser
                 stream.next();
 
                 return new ConstantNode(token.value);
-
             default:
                 if (token.test(TokenType.PUNCTUATION, "[")) {
-                    node = parseArrayExpression();
+                    node = parseListExpression(ArrayList.class);
                 } else if (token.test(TokenType.PUNCTUATION, "{")) {
-                    node = parseHashExpression();
+                    node = parseMapExpression(HashMap.class);
                 } else {
                     throw new SyntaxError(String.format("Unexpected token \"%s\" of value \"%s\"", token.type, token.value), token.cursor, this.stream.getExpression());
                 }
@@ -215,11 +221,11 @@ public class Parser
         return parsePostfixExpression(node);
     }
 
-    public Node parseArrayExpression()
+    public ListNode parseListExpression(Class<? extends List> type)
     {
         stream.expect(TokenType.PUNCTUATION, "[", "An array element was expected");
 
-        ListNode node = new ListNode();
+        ListNode node = new ListNode(type);
 
         boolean first = true;
 
@@ -241,11 +247,35 @@ public class Parser
         return node;
     }
 
-    public MapNode parseHashExpression()
+    public Node parseComposite(Token name)
     {
-        stream.expect(TokenType.PUNCTUATION, "{", "A hash element was expected");
+        Token identifier = stream.getCurrent();
 
-        MapNode node = new MapNode();
+        String[] searchPackages = {
+                "java.lang",
+                "java.util",
+        };
+
+        Class<?> type = ClassFinder.findClassByName((String) name.value, searchPackages);
+
+        if (type == null) {
+            throw new SyntaxError("Composite type not found, type \"%s\" got \"%s\"", identifier.cursor, stream.getExpression());
+        }
+
+        if (Objects.equals(identifier.value, "{") && Map.class.isAssignableFrom(type)) {
+            return parseMapExpression((Class<? extends Map>) type);
+        } else if (Objects.equals(identifier.value, "[") && List.class.isAssignableFrom(type)) {
+            return parseListExpression((Class<? extends List>) type);
+        }
+
+        throw new SyntaxError(String.format("Invalid composite definition, type: \"%s\", identifier: \"%s\"", type.getSimpleName(), identifier.value), name.cursor, stream.getExpression());
+    }
+
+    public MapNode parseMapExpression(Class<? extends Map> type)
+    {
+        MapNode node = new MapNode(type);
+
+        stream.expect(TokenType.PUNCTUATION, "{", "A hash element was expected");
 
         boolean first = true;
 
@@ -284,13 +314,14 @@ public class Parser
     {
         Token token = stream.getCurrent();
 
+        Pattern namePattern = Pattern.compile("^[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*$");
+
         while (token.test(TokenType.PUNCTUATION)) {
             if (Objects.equals(token.value, ".")) {
                 stream.next();
                 token = stream.getCurrent();
                 stream.next();
 
-                Pattern namePattern = Pattern.compile("^[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*$");
                 Matcher nameMatcher = namePattern.matcher(token.stringValue());
 
                 // https://github.com/symfony/expression-language/blob/master/Parser.php#L317

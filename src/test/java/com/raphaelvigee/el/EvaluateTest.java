@@ -171,6 +171,16 @@ public class EvaluateTest
                 },
                 {
                         null,
+                        "LinkedHashMap#{}",
+                        new LinkedHashMap<>()
+                },
+                {
+                        null,
+                        "LinkedList#[]",
+                        new LinkedList<>()
+                },
+                {
+                        null,
                         "[1, 2, 3, 4]",
                         Arrays.asList(1, 2, 3, 4)
                 },

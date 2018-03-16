@@ -10,6 +10,15 @@ public class ListNode extends Node<List<Object>>
 {
     public List<Node> entries = new LinkedList<>();
 
+    private Class<? extends List> type;
+
+    public ListNode(Class<? extends List> type)
+    {
+        super();
+
+        this.type = type;
+    }
+
     public void addElement(Node value)
     {
         entries.add(value);
@@ -21,7 +30,13 @@ public class ListNode extends Node<List<Object>>
         return entries
                 .stream()
                 .map(e -> e.evaluate(env))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> {
+                    try {
+                        return (List<Object>) type.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
     }
 
     @Override
